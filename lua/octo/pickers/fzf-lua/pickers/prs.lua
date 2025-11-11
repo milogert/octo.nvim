@@ -73,15 +73,50 @@ return function(opts)
               local entry = entry_maker.gen_from_issue(pull)
 
               if entry ~= nil then
-                formatted_pulls[entry.ordinal] = entry
                 local highlight
                 if entry.obj.isDraft then
                   highlight = "OctoSymbol"
                 else
                   highlight = "OctoStateOpen"
                 end
+
                 local prefix = fzf.utils.ansi_from_hl(highlight, entry.value)
-                fzf_cb(prefix .. " " .. entry.obj.title)
+
+                -- Sometimes `reviewDecision` is vim.NIL, so we need to guard
+                -- against that.
+                local review_decision_field
+                if entry.obj.reviewDecision == vim.NIL then
+                  review_decision_field = "PENDING"
+                else
+                  review_decision_field = entry.obj.reviewDecision
+                end
+
+                local review_decision = fzf.utils.ansi_from_hl(
+                  utils.state_hl_map[review_decision_field],
+                  utils.state_icon_map[review_decision_field]
+                )
+
+                local author =
+                  fzf.utils.ansi_from_hl("OctoSymbol", entry.obj.author.login)
+
+                local key = entry.value
+                  .. " "
+                  .. utils.state_icon_map[review_decision_field]
+                  .. entry.obj.title
+                  .. " "
+                  .. entry.obj.author.login
+                formatted_pulls[key] = entry
+
+                -- Add review decision here, but we need to ignore parts of the
+                -- string.
+                fzf_cb(
+                  prefix
+                    .. " "
+                    .. review_decision
+                    .. entry.obj.title
+                    .. " "
+                    .. author
+                )
               end
             end
           end

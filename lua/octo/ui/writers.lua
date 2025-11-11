@@ -815,6 +815,22 @@ function M.write_details(bufnr, issue, update)
     end
     table.insert(changes_vt, { ")", "OctoDetailsLabel" })
     table.insert(details, changes_vt)
+
+    -- latest_deployment
+    if not is_issue then
+      for i = #issue.timelineItems.nodes, 1, -1 do
+        local timelineItem = issue.timelineItems.nodes[i]
+        if timelineItem.__typename == 'DeployedEvent' then
+            local latest_deployment_vt = {
+              { "Latest Deployment: ", "OctoDetailsLabel" },
+              { timelineItem.deployment.latestStatus.environmentUrl, "OctoDetailsValue" },
+              { " " .. utils.format_date(timelineItem.createdAt), "OctoDate" },
+            }
+            table.insert(details, latest_deployment_vt)
+            break
+        end
+      end
+    end
   end
 
   local line = 3
@@ -2222,6 +2238,7 @@ function M.write_deployed_event(bufnr, item)
   })
   table.insert(vt, { " deployed to ", "OctoTimelineItemHeading" })
   table.insert(vt, { item.deployment.environment, "OctoDetailsLabel" })
+  table.insert(vt, { item.deployment.latestStatus.environmentUrl, "OctoDetailsLabel" })
   table.insert(vt, { " " .. utils.format_date(item.createdAt) .. " ", "OctoDate" })
   local bubble_info = utils.deployed_state_map[item.deployment.state]
   local bubble = bubbles.make_bubble(bubble_info[1], bubble_info[2])

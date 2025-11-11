@@ -547,6 +547,9 @@ function M.setup()
       browser = function()
         navigation.open_in_browser()
       end,
+      deployment = function()
+        navigation.open_deployment_in_browser("latest")
+      end,
       url = function()
         M.copy_url()
       end,
@@ -1013,8 +1016,8 @@ function M.octo(object, action, ...)
     end
     return
   end
-  local o = M.commands[object]
-  if not o then
+  local command = M.commands[object]
+  if not command then
     local repo, number, kind = utils.parse_url(object)
     if repo and number and kind == "issue" then
       utils.get_issue(number, repo)
@@ -1027,22 +1030,22 @@ function M.octo(object, action, ...)
       return
     end
   else
-    if type(o) == "function" then
+    if type(command) == "function" then
       if object == "search" then
-        o(action, ...)
+        command(action, ...)
       else
-        o(...)
+        command(...)
       end
       return
     end
 
-    local a = o[action] or o
-    if not a then
+    local subcommand = command[action] or command
+    if not subcommand then
       utils.error(action and "Incorrect action: " .. action or "No action specified")
       return
     end
 
-    res = pcall(a, ...)
+    res = pcall(subcommand, ...)
     if not res then
       utils.error(action and "Failed action: " .. action)
       return

@@ -514,12 +514,16 @@ query(
     ) {
       nodes {
         __typename
+        author {
+          login
+        }
         number
         title
         url
         repository { nameWithOwner }
         headRefName
         isDraft
+        reviewDecision
         state
       }
       pageInfo {

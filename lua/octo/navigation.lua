@@ -93,6 +93,22 @@ function M.open_in_browser(kind, repo, number)
   pcall(vim.cmd, "silent !" .. cmd)
 end
 
+--[[
+Opens a deployment in the browser. Either it's the latest one or the one under your cursor.
+]]
+
+---@param target? "latest"|"cursor"
+function M.open_deployment_in_browser(target)
+  local buffer = utils.get_current_buffer()
+  if buffer:isPullRequest() then
+    local latest_deployment = buffer:get_deployment_url()
+
+    if latest_deployment then
+      M.open_in_browser_raw(latest_deployment)
+    end
+  end
+end
+
 local function open_file_if_found(path, line)
   local stat = vim.loop.fs_stat(path)
   if stat and stat.type then

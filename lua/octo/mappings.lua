@@ -98,6 +98,9 @@ return {
   reload = function()
     require("octo.commands").reload()
   end,
+  open_deployment_in_browser = function()
+    require("octo.navigation").open_deployment_in_browser()
+  end,
   open_in_browser = function()
     require("octo.navigation").open_in_browser()
   end,

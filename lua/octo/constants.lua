@@ -32,4 +32,6 @@ M.URL_RELEASE_PATTERN = "[htps]+://[^/]+/([^/]+/[^/]+)/(releases)/tag/([^/]+)"
 
 M.USER_PATTERN = "@([%w-_]+)"
 
+M.DEPLOYMENT_PATTERN = "DEPLOYMENT: %w+ ([htps]+://[^ ]+)"
+
 return M

@@ -1374,4 +1374,35 @@ function OctoBuffer:update_reactions_at_cursor(reaction_groups, reaction_line)
   end
 end
 
+function OctoBuffer:get_latest_deployment()
+  if not self:isPullRequest() then
+    return
+  end
+
+  local items = self:pullRequest().timelineItems.nodes
+
+  for i = #items, 1, -1 do
+    local timelineItem = items[i]
+    if timelineItem.__typename == 'DeployedEvent' then
+      return timelineItem
+    end
+  end
+end
+
+---Gets the deployment, either at the cursor or the latest one (i.e. in the header)
+function OctoBuffer:get_deployment_url()
+  local deployment_url = utils.extract_pattern_at_cursor(constants.DEPLOYMENT_PATTERN)
+
+  if deployment_url then
+    return deployment_url
+  end
+
+  local latest_deployment = self:get_latest_deployment()
+
+  if latest_deployment then
+    return latest_deployment.deployment.latestStatus.environmentUrl
+  end
+end
+
+
 return M
